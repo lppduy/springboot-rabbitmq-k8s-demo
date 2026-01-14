@@ -47,26 +47,33 @@ Order Service (8081) → RabbitMQ → Notification Service (8082)
 
 ### Local Development
 
-#### 1. Start PostgreSQL and RabbitMQ
+#### Quick Start (Recommended - All in Docker)
 ```bash
-# Start all infrastructure services
+# Start all services (PostgreSQL, RabbitMQ, Order Service, Notification Service)
 docker-compose up -d
-
-# Check services are running
-docker-compose ps
 
 # View logs
 docker-compose logs -f
+
+# Stop all services
+docker-compose down
+
+# Rebuild and start (after code changes)
+docker-compose up -d --build
 ```
 
-#### 2. Run Order Service
+#### Alternative: Run Spring Boot Services Locally
+If you prefer to run Spring Boot services with hot reload:
+
 ```bash
+# 1. Start infrastructure only
+docker-compose up -d postgres rabbitmq
+
+# 2. Run Order Service
 cd order-service
 mvn spring-boot:run
-```
 
-#### 3. Run Notification Service
-```bash
+# 3. Run Notification Service (in another terminal)
 cd notification-service
 mvn spring-boot:run
 ```
