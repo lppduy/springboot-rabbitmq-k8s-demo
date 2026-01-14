@@ -1,6 +1,6 @@
 # Spring Boot + RabbitMQ + Kubernetes Demo
 
-Demo microservices với Spring Boot, RabbitMQ, và Kubernetes deployment.
+A microservices demo with Spring Boot, RabbitMQ, and Kubernetes deployment.
 
 ## 🏗️ Architecture
 
