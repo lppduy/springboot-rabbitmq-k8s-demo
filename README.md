@@ -468,7 +468,6 @@ mvn test
 GitHub Actions workflow automatically:
 - Runs tests on push/PR
 - Builds and tests both services
-- Generates test reports
 
 See `.github/workflows/ci.yml` for details.
 
