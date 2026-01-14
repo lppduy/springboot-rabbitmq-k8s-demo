@@ -8,7 +8,6 @@ import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import jakarta.annotation.PostConstruct;
 
 /**
  * RabbitMQ configuration for Order Service
@@ -63,13 +62,12 @@ public class RabbitMQConfig {
     
     /**
      * RabbitAdmin for managing RabbitMQ resources
-     * Automatically handles queue/exchange declaration
+     * Automatically declares queue, exchange, and binding on startup
+     * Only Order Service declares these resources (Publisher owns the queue definition)
      */
     @Bean
     public RabbitAdmin rabbitAdmin(ConnectionFactory connectionFactory) {
-        RabbitAdmin admin = new RabbitAdmin(connectionFactory);
-        admin.setIgnoreDeclarationExceptions(true); // Ignore if queue already exists with different config
-        return admin;
+        return new RabbitAdmin(connectionFactory);
     }
     
     /**
@@ -82,18 +80,5 @@ public class RabbitMQConfig {
         RabbitTemplate template = new RabbitTemplate(connectionFactory);
         template.setMessageConverter(messageConverter);
         return template;
-    }
-    
-    /**
-     * Auto-delete old queue if config changed (only in Order Service as it starts first)
-     */
-    @PostConstruct
-    public void initializeQueue(RabbitAdmin rabbitAdmin) {
-        try {
-            // Try to delete old queue if exists (ignore if doesn't exist)
-            rabbitAdmin.deleteQueue(QUEUE);
-        } catch (Exception e) {
-            // Ignore if queue doesn't exist
-        }
     }
 }

@@ -1,8 +1,5 @@
 package com.demo.notification.config;
 
-import org.springframework.amqp.core.*;
-import org.springframework.amqp.rabbit.connection.ConnectionFactory;
-import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Bean;
@@ -10,7 +7,9 @@ import org.springframework.context.annotation.Configuration;
 
 /**
  * RabbitMQ configuration for Notification Service
- * Defines queue, exchange, binding, and message converter for consuming messages
+ * 
+ * Note: Queue, Exchange, and Binding are declared by Order Service (Publisher).
+ * This service only consumes messages from the queue.
  */
 @Configuration
 public class RabbitMQConfig {
@@ -21,52 +20,11 @@ public class RabbitMQConfig {
     public static final String ROUTING_KEY = "order.created";
     
     /**
-     * Declare Direct Exchange
-     * Creates exchange if it doesn't exist
-     */
-    @Bean
-    public DirectExchange ordersExchange() {
-        return new DirectExchange(EXCHANGE);
-    }
-    
-    /**
-     * Declare Queue for consuming notifications
-     * Must match Order Service configuration (including x-message-ttl)
-     */
-    @Bean
-    public Queue notificationQueue() {
-        return QueueBuilder.durable(QUEUE)
-                .withArgument("x-message-ttl", 60000) // Message TTL: 60 seconds (must match Order Service)
-                .build();
-    }
-    
-    /**
-     * Bind Queue to Exchange with Routing Key
-     */
-    @Bean
-    public Binding binding(Queue notificationQueue, DirectExchange ordersExchange) {
-        return BindingBuilder
-                .bind(notificationQueue)
-                .to(ordersExchange)
-                .with(ROUTING_KEY);
-    }
-    
-    /**
      * Message Converter: Auto deserialize JSON to Java Object
+     * Required for @RabbitListener to deserialize messages
      */
     @Bean
     public MessageConverter messageConverter() {
         return new Jackson2JsonMessageConverter();
-    }
-    
-    /**
-     * RabbitAdmin for managing RabbitMQ resources
-     * Automatically handles queue/exchange declaration
-     */
-    @Bean
-    public RabbitAdmin rabbitAdmin(ConnectionFactory connectionFactory) {
-        RabbitAdmin admin = new RabbitAdmin(connectionFactory);
-        admin.setIgnoreDeclarationExceptions(true); // Ignore if queue already exists with different config
-        return admin;
     }
 }
