@@ -2,6 +2,7 @@ package com.demo.order.controller;
 
 import com.demo.order.dto.CreateOrderRequest;
 import com.demo.order.dto.OrderResponse;
+import com.demo.order.dto.OrderResponseWrapper;
 import com.demo.order.service.OrderService;
 import com.demo.order.shared.response.BaseResponse;
 import com.demo.order.shared.response.ResponseUtils;
@@ -46,12 +47,7 @@ public class OrderController {
         @ApiResponse(
             responseCode = "201",
             description = "Order created successfully",
-            content = @Content(
-                schema = @Schema(implementation = BaseResponse.class),
-                examples = @io.swagger.v3.oas.annotations.media.ExampleObject(
-                    value = "{\"status\": 201, \"message\": \"Order created successfully\", \"data\": {\"orderId\": \"ORD-123\", \"customerId\": \"CUST-001\", \"amount\": 99.99, \"status\": \"CREATED\", \"createdAt\": \"2026-01-14T11:53:03.178Z\"}}"
-                )
-            )
+            content = @Content(schema = @Schema(implementation = OrderResponseWrapper.class))
         ),
         @ApiResponse(
             responseCode = "400",
@@ -103,12 +99,7 @@ public class OrderController {
         @ApiResponse(
             responseCode = "200",
             description = "Order found",
-            content = @Content(
-                schema = @Schema(implementation = BaseResponse.class),
-                examples = @io.swagger.v3.oas.annotations.media.ExampleObject(
-                    value = "{\"status\": 200, \"message\": \"Order retrieved successfully\", \"data\": {\"orderId\": \"ORD-123\", \"customerId\": \"CUST-001\", \"amount\": 99.99, \"status\": \"CREATED\", \"createdAt\": \"2026-01-14T11:53:03.178Z\"}}"
-                )
-            )
+            content = @Content(schema = @Schema(implementation = OrderResponseWrapper.class))
         ),
         @ApiResponse(
             responseCode = "404",
