@@ -122,17 +122,4 @@ public class OrderController {
             orders
         );
     }
-    
-    /**
-     * Health check endpoint
-     * Simple endpoint to verify service is running
-     */
-    @GetMapping("/health")
-    @Operation(
-        summary = "Health check",
-        description = "Verify that the order service is running"
-    )
-    public ResponseEntity<BaseResponse<String>> health() {
-        return ResponseUtils.ok("Order service is healthy");
-    }
 }

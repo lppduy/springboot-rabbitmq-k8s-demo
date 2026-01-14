@@ -4,6 +4,9 @@ server:
 spring:
   application:
     name: order-service
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
   
   # Database Configuration
   datasource:
@@ -46,25 +49,35 @@ springdoc:
     path: /api-docs
   swagger-ui:
     path: /swagger-ui.html
+    enabled: true
     tags-sorter: alpha
     operations-sorter: alpha
+    try-it-out-enabled: true
 
 # Actuator Configuration
+# Expose health endpoints for K8s probes and monitoring
 management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics
+        include: health  # Only expose health endpoint
   endpoint:
     health:
       probes:
-        enabled: true
-      show-details: always
+        enabled: true  # Enable for K8s liveness/readiness probes
+      show-details: always  # Show details for debugging
   health:
     livenessState:
       enabled: true
     readinessState:
       enabled: true
+    # Configure health indicators
+    db:
+      enabled: true  # Check database connection
+    rabbit:
+      enabled: true  # Check RabbitMQ connection
+    diskspace:
+      enabled: false  # Disable disk space check for demo
 
 # Logging Configuration
 logging:
