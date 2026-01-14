@@ -147,6 +147,19 @@ mvn clean package -DskipTests
 docker build -t notification-service:latest .
 ```
 
+**Note for Minikube users:** If you're using Minikube, load images into Minikube's Docker daemon:
+
+```bash
+minikube image load order-service:latest
+minikube image load notification-service:latest
+```
+
+**Alternative:** Use Minikube's Docker daemon directly:
+```bash
+eval $(minikube docker-env)
+# Then build images normally - they will be in Minikube's Docker daemon
+```
+
 ### 2. Deploy Infrastructure
 
 ```bash
@@ -256,6 +269,19 @@ docker build -t order-service:latest .
 cd ../notification-service
 mvn clean package -DskipTests
 docker build -t notification-service:latest .
+```
+
+**Note for Minikube users:** If you're using Minikube, load images into Minikube's Docker daemon:
+
+```bash
+minikube image load order-service:latest
+minikube image load notification-service:latest
+```
+
+**Alternative:** Use Minikube's Docker daemon directly:
+```bash
+eval $(minikube docker-env)
+# Then build images normally - they will be in Minikube's Docker daemon
 ```
 
 ### 2. Install with Default Values
