@@ -29,10 +29,13 @@ public class RabbitMQConfig {
     
     /**
      * Declare Queue for consuming notifications
+     * Must match Order Service configuration (including x-message-ttl)
      */
     @Bean
     public Queue notificationQueue() {
-        return QueueBuilder.durable(QUEUE).build();
+        return QueueBuilder.durable(QUEUE)
+                .withArgument("x-message-ttl", 60000) // Message TTL: 60 seconds (must match Order Service)
+                .build();
     }
     
     /**
