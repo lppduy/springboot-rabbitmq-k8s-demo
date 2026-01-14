@@ -186,8 +186,22 @@ kubectl apply -f k8s/manifests/
 
 ### 4. Access Services
 
+**Understanding K8s Services and Ports:**
+
+In Kubernetes:
+- **Service Port**: Fixed port (8081, 8082) - defined in Service manifest, never changes
+- **Multiple Pod Instances**: Service automatically load balances across all pod replicas
+- **Port Forwarding**: Maps your local machine port to the service port for testing
+
+**Example:** If you have 3 replicas of Order Service:
+- All 3 pods listen on port 8081 (container port)
+- Service exposes port 8081 (service port)
+- Service load balances requests across all 3 pods
+- Port forwarding: `kubectl port-forward svc/order-service 8081:8081` maps local:8081 → service:8081
+
 ```bash
 # Port forward Order Service
+# Format: kubectl port-forward svc/<service-name> <local-port>:<service-port>
 kubectl port-forward svc/order-service 8081:8081
 
 # Port forward Notification Service
@@ -196,6 +210,8 @@ kubectl port-forward svc/notification-service 8082:8082
 # Port forward RabbitMQ Management
 kubectl port-forward svc/rabbitmq-service 15672:15672
 ```
+
+**Note:** For production, use Ingress or LoadBalancer service type instead of port-forwarding.
 
 ### 5. Check Status
 
@@ -269,8 +285,22 @@ helm upgrade microservices-demo ./helm/microservices-demo
 
 ### 5. Access Services
 
+**Understanding K8s Services and Ports:**
+
+In Kubernetes:
+- **Service Port**: Fixed port (8081, 8082) - defined in Service manifest, never changes
+- **Multiple Pod Instances**: Service automatically load balances across all pod replicas
+- **Port Forwarding**: Maps your local machine port to the service port for testing
+
+**Example:** If you have 3 replicas of Order Service:
+- All 3 pods listen on port 8081 (container port)
+- Service exposes port 8081 (service port)
+- Service load balances requests across all 3 pods
+- Port forwarding: `kubectl port-forward svc/order-service 8081:8081` maps local:8081 → service:8081
+
 ```bash
 # Port forward Order Service
+# Format: kubectl port-forward svc/<service-name> <local-port>:<service-port>
 kubectl port-forward svc/order-service 8081:8081
 
 # Port forward Notification Service
@@ -279,6 +309,8 @@ kubectl port-forward svc/notification-service 8082:8082
 # Port forward RabbitMQ Management
 kubectl port-forward svc/rabbitmq-service 15672:15672
 ```
+
+**Note:** For production, use Ingress or LoadBalancer service type instead of port-forwarding.
 
 ### 6. Uninstall
 
