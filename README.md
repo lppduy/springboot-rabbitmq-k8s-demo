@@ -12,6 +12,8 @@ Order Service (8081) → RabbitMQ → Notification Service (8082)
 
 - **Spring Boot 3.5.0**
 - **Java 17**
+- **PostgreSQL 15**
+- **Spring Data JPA**
 - **RabbitMQ 3.13**
 - **Kubernetes**
 - **Docker**
@@ -21,9 +23,14 @@ Order Service (8081) → RabbitMQ → Notification Service (8082)
 ## 📦 Services
 
 ### Order Service (Port 8081)
-- REST API để tạo orders
+- REST API để tạo và query orders
+- PostgreSQL database persistence
 - Publish events to RabbitMQ
 - Swagger UI: `http://localhost:8081/swagger-ui.html`
+- Endpoints:
+  - `POST /api/orders` - Create order
+  - `GET /api/orders/{orderId}` - Get order by ID
+  - `GET /api/orders?customerId=CUST-001` - Get orders by customer
 
 ### Notification Service (Port 8082)
 - Consume events from RabbitMQ
@@ -40,14 +47,16 @@ Order Service (8081) → RabbitMQ → Notification Service (8082)
 
 ### Local Development
 
-#### 1. Start RabbitMQ
+#### 1. Start PostgreSQL and RabbitMQ
 ```bash
-docker run -d --name rabbitmq \
-  -p 5672:5672 \
-  -p 15672:15672 \
-  -e RABBITMQ_DEFAULT_USER=admin \
-  -e RABBITMQ_DEFAULT_PASS=admin123 \
-  rabbitmq:3.13-management-alpine
+# Start all infrastructure services
+docker-compose up -d
+
+# Check services are running
+docker-compose ps
+
+# View logs
+docker-compose logs -f
 ```
 
 #### 2. Run Order Service
@@ -77,6 +86,7 @@ kubectl port-forward svc/rabbitmq 15672:15672
 
 ### Create Order via API
 ```bash
+# Create an order
 curl -X POST http://localhost:8081/api/orders \
   -H "Content-Type: application/json" \
   -d '{
@@ -85,12 +95,20 @@ curl -X POST http://localhost:8081/api/orders \
   }'
 ```
 
-### Access RabbitMQ Management UI
+### Query Orders
+```bash
+# Get order by ID
+curl http://localhost:8081/api/orders/ORD-ABC12345
+
+# Get all orders for a customer
+curl "http://localhost:8081/api/orders?customerId=CUST-001"
 ```
-http://localhost:15672
-Username: admin
-Password: admin123
-```
+
+### Access Services
+- **Swagger UI - Order Service**: http://localhost:8081/swagger-ui.html
+- **Swagger UI - Notification Service**: http://localhost:8082/swagger-ui.html
+- **RabbitMQ Management**: http://localhost:15672 (admin/admin123)
+- **PostgreSQL**: localhost:5432 (postgres/postgres)
 
 ## 📚 Documentation
 
@@ -120,10 +138,12 @@ Password: admin123
 ## 🔄 Message Flow
 
 1. User creates order via POST `/api/orders`
-2. Order Service saves order and publishes `OrderEvent` to RabbitMQ
-3. RabbitMQ routes message to `notification.queue`
-4. Notification Service consumes message
-5. Notification Service sends email/SMS notification
+2. Order Service validates request and generates order ID
+3. Order Service saves order to PostgreSQL database
+4. Order Service publishes `OrderEvent` to RabbitMQ
+5. RabbitMQ routes message to `notification.queue`
+6. Notification Service consumes message
+7. Notification Service sends email/SMS notification
 
 ## 📝 License
 

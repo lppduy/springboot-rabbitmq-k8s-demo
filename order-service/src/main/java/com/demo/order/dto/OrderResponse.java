@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @Schema(description = "Order creation response")
 public class OrderResponse {
     
-    @Schema(description = "Unique order identifier", example = "ORD-abc12345")
+    @Schema(description = "Unique order identifier", example = "ORD-ABC12345")
     private String orderId;
     
     @Schema(description = "Customer identifier", example = "CUST-001")
@@ -31,7 +31,4 @@ public class OrderResponse {
     
     @Schema(description = "Order creation timestamp")
     private LocalDateTime createdAt;
-    
-    @Schema(description = "Message indicating order event was published", example = "Order created and notification sent")
-    private String message;
 }
