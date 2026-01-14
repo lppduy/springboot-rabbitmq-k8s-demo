@@ -43,7 +43,16 @@ public class OrderController {
         description = "Creates a new order and publishes an event to RabbitMQ for downstream processing (notifications, inventory, etc.)"
     )
     @ApiResponses(value = {
-        // 201 response is auto-detected from return type ResponseEntity<BaseResponse<OrderResponse>>
+        @ApiResponse(
+            responseCode = "201",
+            description = "Order created successfully",
+            content = @Content(
+                mediaType = "application/json",
+                examples = @io.swagger.v3.oas.annotations.media.ExampleObject(
+                    value = "{\"status\": 201, \"message\": \"Order created successfully and notification event published\", \"data\": {\"orderId\": \"ORD-123\", \"customerId\": \"CUST-001\", \"amount\": 99.99, \"status\": \"PENDING\", \"createdAt\": \"2026-01-14T12:00:00Z\"}}"
+                )
+            )
+        ),
         @ApiResponse(
             responseCode = "400",
             description = "Invalid request parameters",
@@ -91,7 +100,16 @@ public class OrderController {
         description = "Retrieve order details by order ID"
     )
     @ApiResponses(value = {
-        // 200 response is auto-detected from return type ResponseEntity<BaseResponse<OrderResponse>>
+        @ApiResponse(
+            responseCode = "200",
+            description = "Order found",
+            content = @Content(
+                mediaType = "application/json",
+                examples = @io.swagger.v3.oas.annotations.media.ExampleObject(
+                    value = "{\"status\": 200, \"message\": \"Order retrieved successfully\", \"data\": {\"orderId\": \"ORD-123\", \"customerId\": \"CUST-001\", \"amount\": 99.99, \"status\": \"PENDING\", \"createdAt\": \"2026-01-14T12:00:00Z\"}}"
+                )
+            )
+        ),
         @ApiResponse(
             responseCode = "404",
             description = "Order not found",
