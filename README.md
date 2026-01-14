@@ -49,7 +49,11 @@ Order Service (8081) → RabbitMQ → Notification Service (8082)
 
 #### Quick Start (Recommended - All in Docker)
 ```bash
-# Start all services (PostgreSQL, RabbitMQ, Order Service, Notification Service)
+# 1. Build JAR files first
+cd order-service && mvn clean package -DskipTests && cd ..
+cd notification-service && mvn clean package -DskipTests && cd ..
+
+# 2. Start all services (PostgreSQL, RabbitMQ, Order Service, Notification Service)
 docker-compose up -d
 
 # View logs
@@ -59,6 +63,8 @@ docker-compose logs -f
 docker-compose down
 
 # Rebuild and start (after code changes)
+cd order-service && mvn clean package -DskipTests && cd ..
+cd notification-service && mvn clean package -DskipTests && cd ..
 docker-compose up -d --build
 ```
 
