@@ -46,17 +46,32 @@ public class OrderController {
         @ApiResponse(
             responseCode = "201",
             description = "Order created successfully",
-            content = @Content(schema = @Schema(implementation = OrderResponse.class))
+            content = @Content(
+                schema = @Schema(implementation = BaseResponse.class),
+                examples = @io.swagger.v3.oas.annotations.media.ExampleObject(
+                    value = "{\"status\": 201, \"message\": \"Order created successfully\", \"data\": {\"orderId\": \"ORD-123\", \"customerId\": \"CUST-001\", \"amount\": 99.99, \"status\": \"CREATED\", \"createdAt\": \"2026-01-14T11:53:03.178Z\"}}"
+                )
+            )
         ),
         @ApiResponse(
             responseCode = "400",
             description = "Invalid request parameters",
-            content = @Content(schema = @Schema(implementation = BaseResponse.class))
+            content = @Content(
+                schema = @Schema(implementation = BaseResponse.class),
+                examples = @io.swagger.v3.oas.annotations.media.ExampleObject(
+                    value = "{\"status\": 400, \"message\": \"Validation error message\", \"data\": null}"
+                )
+            )
         ),
         @ApiResponse(
             responseCode = "503",
             description = "RabbitMQ service unavailable",
-            content = @Content(schema = @Schema(implementation = BaseResponse.class))
+            content = @Content(
+                schema = @Schema(implementation = BaseResponse.class),
+                examples = @io.swagger.v3.oas.annotations.media.ExampleObject(
+                    value = "{\"status\": 503, \"message\": \"Message queue is temporarily unavailable. Please try again later.\", \"data\": null}"
+                )
+            )
         )
     })
     public ResponseEntity<BaseResponse<OrderResponse>> createOrder(
@@ -88,12 +103,22 @@ public class OrderController {
         @ApiResponse(
             responseCode = "200",
             description = "Order found",
-            content = @Content(schema = @Schema(implementation = OrderResponse.class))
+            content = @Content(
+                schema = @Schema(implementation = BaseResponse.class),
+                examples = @io.swagger.v3.oas.annotations.media.ExampleObject(
+                    value = "{\"status\": 200, \"message\": \"Order retrieved successfully\", \"data\": {\"orderId\": \"ORD-123\", \"customerId\": \"CUST-001\", \"amount\": 99.99, \"status\": \"CREATED\", \"createdAt\": \"2026-01-14T11:53:03.178Z\"}}"
+                )
+            )
         ),
         @ApiResponse(
             responseCode = "404",
             description = "Order not found",
-            content = @Content(schema = @Schema(implementation = BaseResponse.class))
+            content = @Content(
+                schema = @Schema(implementation = BaseResponse.class),
+                examples = @io.swagger.v3.oas.annotations.media.ExampleObject(
+                    value = "{\"status\": 404, \"message\": \"Order not found\", \"data\": null}"
+                )
+            )
         )
     })
     public ResponseEntity<BaseResponse<OrderResponse>> getOrderById(@PathVariable String orderId) {
