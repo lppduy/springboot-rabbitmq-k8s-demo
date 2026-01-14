@@ -31,19 +31,3 @@ jobs:
         run: |
           cd notification-service
           mvn clean test
-      
-      - name: Generate test coverage report
-        run: |
-          cd order-service
-          mvn jacoco:report
-          cd ../notification-service
-          mvn jacoco:report
-      
-      - name: Upload coverage reports
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-reports
-          path: |
-            order-service/target/site/jacoco/
-            notification-service/target/site/jacoco/
-          retention-days: 7
