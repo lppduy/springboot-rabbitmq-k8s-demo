@@ -1,0 +1,17 @@
+{{- if .Values.orderService.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: order-service
+  labels:
+    app: order-service
+spec:
+  type: {{ .Values.orderService.service.type }}
+  ports:
+  - port: {{ .Values.orderService.service.port }}
+    targetPort: 8081
+    protocol: TCP
+    name: http
+  selector:
+    app: order-service
+{{- end }}

@@ -1,0 +1,110 @@
+# Global settings
+global:
+  imageRegistry: ""
+  imagePullPolicy: IfNotPresent
+
+# Order Service Configuration
+orderService:
+  enabled: true
+  image:
+    repository: order-service
+    tag: latest
+    pullPolicy: IfNotPresent
+  replicaCount: 2
+  service:
+    type: ClusterIP
+    port: 8081
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "200m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+  database:
+    host: "postgres-service"
+    port: 5432
+    name: "orders_db"
+  rabbitmq:
+    host: "rabbitmq-service"
+    port: 5672
+
+# Notification Service Configuration
+notificationService:
+  enabled: true
+  image:
+    repository: notification-service
+    tag: latest
+    pullPolicy: IfNotPresent
+  replicaCount: 2
+  service:
+    type: ClusterIP
+    port: 8082
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "200m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+  rabbitmq:
+    host: "rabbitmq-service"
+    port: 5672
+
+# PostgreSQL Configuration
+postgres:
+  enabled: true
+  image:
+    repository: postgres
+    tag: "15-alpine"
+    pullPolicy: IfNotPresent
+  replicaCount: 1
+  service:
+    type: ClusterIP
+    port: 5432
+  database:
+    name: "orders_db"
+  persistence:
+    enabled: true
+    size: 10Gi
+    storageClass: ""
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+
+# RabbitMQ Configuration
+rabbitmq:
+  enabled: true
+  image:
+    repository: rabbitmq
+    tag: "3.13-management-alpine"
+    pullPolicy: IfNotPresent
+  replicaCount: 1
+  service:
+    type: ClusterIP
+    amqpPort: 5672
+    managementPort: 15672
+  persistence:
+    enabled: true
+    size: 5Gi
+    storageClass: ""
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "500m"
+    limits:
+      memory: "1Gi"
+      cpu: "1000m"
+
+# Secrets Configuration
+secrets:
+  postgres:
+    username: "postgres"
+    password: "postgres123"
+  rabbitmq:
+    username: "admin"
+    password: "admin123"

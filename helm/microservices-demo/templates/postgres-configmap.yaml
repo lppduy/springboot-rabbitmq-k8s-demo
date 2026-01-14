@@ -1,0 +1,10 @@
+{{- if .Values.postgres.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-config
+  labels:
+    app: postgres
+data:
+  database.name: {{ .Values.postgres.database.name | quote }}
+{{- end }}

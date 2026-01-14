@@ -1,0 +1,11 @@
+{{- if .Values.notificationService.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: notification-service-config
+  labels:
+    app: notification-service
+data:
+  rabbitmq.host: {{ .Values.notificationService.rabbitmq.host | quote }}
+  rabbitmq.port: {{ .Values.notificationService.rabbitmq.port | quote }}
+{{- end }}
