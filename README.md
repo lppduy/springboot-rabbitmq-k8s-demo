@@ -23,7 +23,7 @@ Order Service (8081) → RabbitMQ → Notification Service (8082)
 ## 📦 Services
 
 ### Order Service (Port 8081)
-- REST API để tạo và query orders
+- REST API for creating and querying orders
 - PostgreSQL database persistence
 - Publish events to RabbitMQ
 - Swagger UI: `http://localhost:8081/swagger-ui.html`
