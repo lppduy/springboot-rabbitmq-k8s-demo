@@ -1,0 +1,33 @@
+### Java ###
+*.class
+*.log
+*.jar
+*.war
+*.ear
+target/
+!.mvn/wrapper/maven-wrapper.jar
+
+### Spring Boot ###
+*.pid
+
+### IntelliJ IDEA ###
+.idea/
+*.iml
+out/
+
+### VS Code ###
+.vscode/
+
+### macOS ###
+.DS_Store
+
+### Maven ###
+.mvn/
+mvnw
+mvnw.cmd
+
+### K8s ###
+*.secret.yaml
+
+### Environment ###
+.env
