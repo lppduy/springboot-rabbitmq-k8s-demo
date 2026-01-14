@@ -2,7 +2,6 @@ package com.demo.order.controller;
 
 import com.demo.order.dto.CreateOrderRequest;
 import com.demo.order.dto.OrderResponse;
-import com.demo.order.dto.OrderResponseWrapper;
 import com.demo.order.service.OrderService;
 import com.demo.order.shared.response.BaseResponse;
 import com.demo.order.shared.response.ResponseUtils;
@@ -44,11 +43,7 @@ public class OrderController {
         description = "Creates a new order and publishes an event to RabbitMQ for downstream processing (notifications, inventory, etc.)"
     )
     @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "201",
-            description = "Order created successfully",
-            content = @Content(schema = @Schema(implementation = OrderResponseWrapper.class))
-        ),
+        // 201 response is auto-detected from return type ResponseEntity<BaseResponse<OrderResponse>>
         @ApiResponse(
             responseCode = "400",
             description = "Invalid request parameters",
@@ -96,11 +91,7 @@ public class OrderController {
         description = "Retrieve order details by order ID"
     )
     @ApiResponses(value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "Order found",
-            content = @Content(schema = @Schema(implementation = OrderResponseWrapper.class))
-        ),
+        // 200 response is auto-detected from return type ResponseEntity<BaseResponse<OrderResponse>>
         @ApiResponse(
             responseCode = "404",
             description = "Order not found",
