@@ -2,6 +2,7 @@ package com.demo.notification.consumer;
 
 import com.demo.notification.dto.OrderEvent;
 import com.demo.notification.service.NotificationService;
+import com.demo.notification.service.RetryService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,6 +10,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessageProperties;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -25,10 +28,14 @@ class OrderEventConsumerTest {
     @Mock
     private NotificationService notificationService;
     
+    @Mock
+    private RetryService retryService;
+    
     @InjectMocks
     private OrderEventConsumer orderEventConsumer;
     
     private OrderEvent orderEvent;
+    private Message message;
     
     @BeforeEach
     void setUp() {
@@ -39,6 +46,10 @@ class OrderEventConsumerTest {
             "CREATED",
             LocalDateTime.now()
         );
+        
+        // Create mock message
+        MessageProperties messageProperties = new MessageProperties();
+        message = new Message("test".getBytes(), messageProperties);
     }
     
     @Test
@@ -48,25 +59,26 @@ class OrderEventConsumerTest {
         doNothing().when(notificationService).processOrderNotification(any(OrderEvent.class));
         
         // When
-        orderEventConsumer.handleOrderCreated(orderEvent);
+        orderEventConsumer.handleOrderCreated(orderEvent, message);
         
         // Then
         verify(notificationService, times(1)).processOrderNotification(orderEvent);
+        verify(retryService, never()).handleRetry(any(), any(), any());
     }
     
     @Test
-    @DisplayName("Should propagate exception when notification processing fails")
+    @DisplayName("Should call retry service when notification processing fails")
     void handleOrderCreated_ProcessingFailure() {
         // Given
-        doThrow(new RuntimeException("Notification failed"))
+        RuntimeException exception = new RuntimeException("Notification failed");
+        doThrow(exception)
                 .when(notificationService).processOrderNotification(any(OrderEvent.class));
         
-        // When & Then
-        org.junit.jupiter.api.Assertions.assertThrows(
-            RuntimeException.class,
-            () -> orderEventConsumer.handleOrderCreated(orderEvent)
-        );
+        // When
+        orderEventConsumer.handleOrderCreated(orderEvent, message);
         
+        // Then
         verify(notificationService, times(1)).processOrderNotification(orderEvent);
+        verify(retryService, times(1)).handleRetry(orderEvent, exception, message);
     }
 }

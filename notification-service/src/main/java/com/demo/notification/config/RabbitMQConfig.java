@@ -10,20 +10,29 @@ import org.springframework.context.annotation.Configuration;
 
 /**
  * RabbitMQ configuration for Notification Service
+ * Implements 3-queue pattern: Main Queue, Retry Queue, Dead Letter Queue
  * 
- * Note: This service declares the queue to ensure it exists when starting.
- * If Order Service has already declared the queue, declaration exceptions are ignored.
+ * Note: This service declares the queues to ensure they exist when starting.
+ * If Order Service has already declared them, declaration exceptions are ignored.
  */
 @Configuration
 public class RabbitMQConfig {
     
     // RabbitMQ constants - must match Order Service configuration
     public static final String EXCHANGE = "orders.exchange";
-    public static final String QUEUE = "notification.queue";
+    public static final String DLX = "orders.dlx"; // Dead Letter Exchange
+    public static final String MAIN_QUEUE = "notification.queue";
+    public static final String RETRY_QUEUE = "notification.retry";
+    public static final String DLQ = "notification.dlq";
     public static final String ROUTING_KEY = "order.created";
+    public static final String RETRY_ROUTING_KEY = "notification.retry";
+    public static final String DLQ_ROUTING_KEY = "notification.dlq";
+    
+    // TTL settings (in milliseconds) - must match Order Service
+    private static final long MAIN_QUEUE_TTL = 300000L; // 5 minutes
     
     /**
-     * Declare Direct Exchange for order events
+     * Declare Main Exchange for order events
      * Must match Order Service configuration
      */
     @Bean
@@ -32,26 +41,83 @@ public class RabbitMQConfig {
     }
     
     /**
-     * Declare Queue for notifications
-     * Must match Order Service configuration exactly (including x-message-ttl)
+     * Declare Dead Letter Exchange (DLX)
+     * Must match Order Service configuration
+     */
+    @Bean
+    public DirectExchange deadLetterExchange() {
+        return new DirectExchange(DLX);
+    }
+    
+    /**
+     * Declare Main Queue for notifications
+     * Must match Order Service configuration exactly
      */
     @Bean
     public Queue notificationQueue() {
-        return QueueBuilder.durable(QUEUE)
-                .withArgument("x-message-ttl", 60000) // Message TTL: 60 seconds (must match Order Service)
+        return QueueBuilder.durable(MAIN_QUEUE)
+                .withArgument("x-message-ttl", MAIN_QUEUE_TTL)
+                .withArgument("x-dead-letter-exchange", DLX)
+                .withArgument("x-dead-letter-routing-key", RETRY_ROUTING_KEY)
                 .build();
     }
     
     /**
-     * Bind Queue to Exchange with Routing Key
+     * Declare Retry Queue
      * Must match Order Service configuration
      */
     @Bean
-    public Binding binding(Queue notificationQueue, DirectExchange ordersExchange) {
+    public Queue retryQueue() {
+        return QueueBuilder.durable(RETRY_QUEUE)
+                .withArgument("x-dead-letter-exchange", EXCHANGE)
+                .withArgument("x-dead-letter-routing-key", ROUTING_KEY)
+                .build();
+    }
+    
+    /**
+     * Declare Dead Letter Queue
+     * Must match Order Service configuration
+     */
+    @Bean
+    public Queue deadLetterQueue() {
+        return QueueBuilder.durable(DLQ)
+                .build();
+    }
+    
+    /**
+     * Bind Main Queue to Main Exchange
+     * Must match Order Service configuration
+     */
+    @Bean
+    public Binding mainQueueBinding(Queue notificationQueue, DirectExchange ordersExchange) {
         return BindingBuilder
                 .bind(notificationQueue)
                 .to(ordersExchange)
                 .with(ROUTING_KEY);
+    }
+    
+    /**
+     * Bind Retry Queue to Dead Letter Exchange
+     * Must match Order Service configuration
+     */
+    @Bean
+    public Binding retryQueueBinding(Queue retryQueue, DirectExchange deadLetterExchange) {
+        return BindingBuilder
+                .bind(retryQueue)
+                .to(deadLetterExchange)
+                .with(RETRY_ROUTING_KEY);
+    }
+    
+    /**
+     * Bind Dead Letter Queue to Dead Letter Exchange
+     * Must match Order Service configuration
+     */
+    @Bean
+    public Binding dlqBinding(Queue deadLetterQueue, DirectExchange deadLetterExchange) {
+        return BindingBuilder
+                .bind(deadLetterQueue)
+                .to(deadLetterExchange)
+                .with(DLQ_ROUTING_KEY);
     }
     
     /**
