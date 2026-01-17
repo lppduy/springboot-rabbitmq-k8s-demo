@@ -2,6 +2,14 @@
 
 A microservices demo with Spring Boot, RabbitMQ, and Kubernetes deployment.
 
+## 📚 Documentation
+
+**[RabbitMQ Architecture & Implementation Guide](./docs/RABBITMQ.md)** - Detailed documentation on:
+- 3-Queue Pattern (Main → Retry → Dead Letter Queue)
+- Exponential Backoff Retry Mechanism
+- TTL Configuration & Message Flow
+- Code Implementation Details
+
 ## 🏗️ Architecture
 
 ```mermaid
