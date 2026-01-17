@@ -32,15 +32,24 @@ This project implements a robust RabbitMQ messaging system with a **3-Queue Patt
 ### 3-Queue Pattern Overview
 
 ```mermaid
-graph LR
-    OrderService[Order Service<br/>Publisher] -->|1. Publish| MainQueue[Main Queue<br/>notification.queue]
-    MainQueue -->|2. Consume| Consumer[Notification Service<br/>Consumer]
-    Consumer -->|3. Success| Done[✓ Done]
-    Consumer -->|4. Failure| RetryService[Retry Service]
-    RetryService -->|5. Send with TTL| RetryQueue[Retry Queue<br/>notification.retry]
-    RetryQueue -->|6. After TTL| MainQueue
-    RetryService -->|7. Max retries exceeded| DLQ[Dead Letter Queue<br/>notification.dlq]
-    DLQ -->|8. Manual processing| Admin[Admin Intervention]
+graph TB
+    OrderService[Order Service Publisher]
+    MainQueue[Main Queue notification.queue]
+    Consumer[Notification Service Consumer]
+    Done[✓ Done]
+    RetryService[Retry Service]
+    RetryQueue[Retry Queue notification.retry]
+    DLQ[Dead Letter Queue notification.dlq]
+    Admin[Admin Review]
+    
+    OrderService -->|1. Publish event| MainQueue
+    MainQueue -->|2. Consume| Consumer
+    Consumer -->|3. Success| Done
+    Consumer -->|4. Failure| RetryService
+    RetryService -->|5a. Count less than 3| RetryQueue
+    RetryService -->|5b. Count equals 3| DLQ
+    RetryQueue -->|6. After TTL expires| MainQueue
+    DLQ -->|7. Manual intervention| Admin
     
     style MainQueue fill:#e1f5ff
     style RetryQueue fill:#fff4e1
